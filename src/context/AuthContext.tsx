@@ -117,26 +117,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase Error (getAllUsers):", error);
+        throw error;
+      }
       return (data || []).map(u => ({
         name: u.name,
         email: u.email,
         role: "user" as const
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching users:", error);
-      toast.error("Failed to load users");
+      toast.error(`Database Error: ${error.message || "Table 'app_users' not found"}`);
       return [];
     }
   };
 
   const addUser = async (name: string, email: string, pass: string) => {
+    console.log(`AuthContext: Attempting to add user ${email} to Supabase...`);
     try {
       const { error } = await supabase
         .from("app_users")
         .insert([{ name, email, password: pass }]);
 
       if (error) {
+        console.error("Supabase Error (addUser):", error);
         if (error.code === "23505") { // Unique violation
           toast.error("User with this email already exists");
         } else {
@@ -145,9 +150,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
       toast.success("User added successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding user:", error);
-      toast.error("Failed to add user");
+      toast.error(`Database Error: ${error.message || "Could not reach database"}. Please check your Supabase SQL Editor.`);
     }
   };
 
@@ -160,9 +165,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (error) throw error;
       toast.success("User deleted successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting user:", error);
-      toast.error("Failed to delete user");
+      toast.error(`Delete failed: ${error.message || "Unknown error"}`);
     }
   };
 
