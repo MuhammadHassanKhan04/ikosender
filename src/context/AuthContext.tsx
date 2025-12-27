@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 type User = {
   name: string;
@@ -13,12 +14,12 @@ type AuthContextType = {
   user: User | null;
   isAdmin: boolean;
   loginAdmin: (email: string, pass: string) => boolean;
-  loginUser: (nameOrEmail: string, pass: string) => boolean;
+  loginUser: (nameOrEmail: string, pass: string) => Promise<boolean>;
   logout: () => void;
   // Admin functions
-  getAllUsers: () => User[];
-  addUser: (name: string, email: string, pass: string) => void;
-  deleteUser: (email: string) => void;
+  getAllUsers: () => Promise<User[]>;
+  addUser: (name: string, email: string, pass: string) => Promise<void>;
+  deleteUser: (email: string) => Promise<void>;
   isAuthenticated: boolean;
 };
 
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return false;
   };
 
-  const loginUser = (nameOrEmail: string, pass: string) => {
+  const loginUser = async (nameOrEmail: string, pass: string) => {
     const cleanIdentifier = nameOrEmail.trim();
     const cleanPass = pass.trim();
 
@@ -69,15 +70,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return loginAdmin(cleanIdentifier, cleanPass);
     }
 
-    // Check against LocalStorage "DB" for normal users
-    const storedUsersStr = localStorage.getItem("ikosender_db_users");
-    const storedUsers: any[] = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+    try {
+      // Query Supabase for the user
+      const { data: foundUser, error } = await supabase
+        .from("app_users")
+        .select("*")
+        .or(`name.eq.${cleanIdentifier},email.eq.${cleanIdentifier}`)
+        .eq("password", cleanPass)
+        .single();
 
-    const foundUser = storedUsers.find(
-      (u) => (u.name === cleanIdentifier || u.email === cleanIdentifier) && u.password === cleanPass
-    );
+      if (error || !foundUser) {
+        toast.error("Invalid Username or Password");
+        return false;
+      }
 
-    if (foundUser) {
       const sessionUser: User = {
         name: foundUser.name,
         email: foundUser.email,
@@ -86,12 +92,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(sessionUser);
       setIsAdmin(false);
       localStorage.setItem("ikosender_user", JSON.stringify(sessionUser));
-      toast.success(`Welcome, ${foundUser.name}!`);
+      toast.success(`Welcome back, ${foundUser.name}!`);
       return true;
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("An error occurred during login");
+      return false;
     }
-
-    toast.error("Invalid Username or Password");
-    return false;
   };
 
   const logout = () => {
@@ -103,28 +110,60 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   // Admin Tools
-  const getAllUsers = () => {
-    const storedUsersStr = localStorage.getItem("ikosender_db_users");
-    return storedUsersStr ? JSON.parse(storedUsersStr) : [];
-  };
+  const getAllUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("app_users")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-  const addUser = (name: string, email: string, pass: string) => {
-    const currentUsers = getAllUsers();
-    if (currentUsers.some((u: any) => u.email === email)) {
-      toast.error("User with this email already exists");
-      return;
+      if (error) throw error;
+      return (data || []).map(u => ({
+        name: u.name,
+        email: u.email,
+        role: "user" as const
+      }));
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to load users");
+      return [];
     }
-    const newUser = { name, email, password: pass };
-    const updatedUsers = [...currentUsers, newUser];
-    localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
-    toast.success("User added successfully");
   };
 
-  const deleteUser = (email: string) => {
-    const currentUsers = getAllUsers();
-    const updatedUsers = currentUsers.filter((u: any) => u.email !== email);
-    localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
-    toast.success("User deleted successfully");
+  const addUser = async (name: string, email: string, pass: string) => {
+    try {
+      const { error } = await supabase
+        .from("app_users")
+        .insert([{ name, email, password: pass }]);
+
+      if (error) {
+        if (error.code === "23505") { // Unique violation
+          toast.error("User with this email already exists");
+        } else {
+          throw error;
+        }
+        return;
+      }
+      toast.success("User added successfully");
+    } catch (error) {
+      console.error("Error adding user:", error);
+      toast.error("Failed to add user");
+    }
+  };
+
+  const deleteUser = async (email: string) => {
+    try {
+      const { error } = await supabase
+        .from("app_users")
+        .delete()
+        .eq("email", email);
+
+      if (error) throw error;
+      toast.success("User deleted successfully");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Failed to delete user");
+    }
   };
 
   return (

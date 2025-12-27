@@ -116,7 +116,7 @@ const FeaturesPage = () => {
                             </div>
                             <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
                                 <p className="text-xs uppercase tracking-widest text-blue-400 font-bold mb-2">Sender IP</p>
-                                <p className="font-mono text-sm leading-relaxed truncate">MAIL-MAVEN-SSL-GATEWAY: 192.168.1.104</p>
+                                <p className="font-mono text-sm leading-relaxed truncate">IKOSENDER-SSL-GATEWAY: 192.168.1.104</p>
                             </div>
                         </div>
                     </div>

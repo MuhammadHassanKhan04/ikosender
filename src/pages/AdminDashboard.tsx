@@ -15,15 +15,38 @@ import { useNavigate } from "react-router-dom";
 const AdminDashboard = () => {
     const { user, logout, getAllUsers, addUser, deleteUser } = useAuth();
     const [newUser, setNewUser] = useState({ name: "", email: "", password: "" });
+    const [users, setUsers] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
     const navigate = useNavigate();
-    const users = getAllUsers();
 
-    const handleAddUser = (e: React.FormEvent) => {
+    const fetchUsers = async () => {
+        setIsLoading(true);
+        const data = await getAllUsers();
+        setUsers(data);
+        setIsLoading(false);
+    };
+
+    React.useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const handleAddUser = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newUser.name && newUser.email && newUser.password) {
-            addUser(newUser.name, newUser.email, newUser.password);
+            setIsActionLoading(true);
+            await addUser(newUser.name, newUser.email, newUser.password);
             setNewUser({ name: "", email: "", password: "" });
+            await fetchUsers();
+            setIsActionLoading(false);
         }
+    };
+
+    const handleDeleteUser = async (email: string) => {
+        setIsActionLoading(true);
+        await deleteUser(email);
+        await fetchUsers();
+        setIsActionLoading(false);
     };
 
     return (
@@ -121,8 +144,12 @@ const AdminDashboard = () => {
                                         required
                                     />
                                 </div>
-                                <Button type="submit" className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 transition-all hover:scale-[1.02]">
-                                    Authorize User
+                                <Button
+                                    type="submit"
+                                    disabled={isActionLoading}
+                                    className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-100 transition-all hover:scale-[1.02]"
+                                >
+                                    {isActionLoading ? "Processing..." : "Authorize User"}
                                 </Button>
                             </CardContent>
                         </form>
@@ -142,7 +169,15 @@ const AdminDashboard = () => {
 
                         <Card className="border-none shadow-xl shadow-gray-200/50 rounded-3xl overflow-hidden bg-white">
                             <CardContent className="p-0">
-                                {users.length === 0 ? (
+                                {isLoading ? (
+                                    <div className="text-center py-20 bg-white">
+                                        <div className="w-16 h-16 bg-blue-50/50 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                                            <Shield className="w-8 h-8 text-blue-300" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900">Synchronizing Registry...</h3>
+                                        <p className="text-gray-500 max-w-xs mx-auto text-sm">Fetching authorized users from the global database.</p>
+                                    </div>
+                                ) : users.length === 0 ? (
                                     <div className="text-center py-20 bg-white">
                                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
                                             <Shield className="w-8 h-8" />
@@ -183,8 +218,9 @@ const AdminDashboard = () => {
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
+                                                            disabled={isActionLoading}
                                                             className="w-10 h-10 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                                                            onClick={() => deleteUser(u.email)}
+                                                            onClick={() => handleDeleteUser(u.email)}
                                                         >
                                                             <Trash2 className="h-5 w-5" />
                                                         </Button>

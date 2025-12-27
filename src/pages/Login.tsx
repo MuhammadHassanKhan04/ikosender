@@ -12,11 +12,17 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const { loginUser } = useAuth();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (loginUser(identifier, password)) {
-            navigate("/dashboard");
+        setIsLoading(true);
+        try {
+            if (await loginUser(identifier, password)) {
+                navigate("/dashboard");
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -59,8 +65,12 @@ const Login = () => {
                                         className="h-14 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:border-blue-600 transition-all font-bold px-6"
                                     />
                                 </div>
-                                <Button type="submit" className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-100 transition-all hover:scale-[1.02]">
-                                    Authenticate Session
+                                <Button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-100 transition-all hover:scale-[1.02]"
+                                >
+                                    {isLoading ? "Authenticating..." : "Authenticate Session"}
                                 </Button>
                             </CardContent>
                             <CardFooter className="px-10 pb-10 flex flex-col gap-4">
