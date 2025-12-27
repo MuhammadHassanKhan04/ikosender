@@ -13,7 +13,7 @@ const AboutPage = () => {
                         <ArrowLeft className="w-5 h-5" /> Home
                     </Link>
                     <Link to="/login">
-                        <Button className="bg-blue-600 hover:bg-blue-700 rounded-xl font-bold">Try Mail Maven</Button>
+                        <Button className="bg-blue-600 hover:bg-blue-700 rounded-xl font-bold">Try IkoSender</Button>
                     </Link>
                 </div>
             </nav>
@@ -28,7 +28,7 @@ const AboutPage = () => {
                         </h1>
                         <p className="text-xl text-gray-500 font-medium leading-relaxed">
                             We believe that technology should amplify human potential, not replace it.
-                            Mail Maven was founded to bridge the gap between complex automation
+                            IkoSender was founded to bridge the gap between complex automation
                             and meaningful, high-impact communication.
                         </p>
                     </div>

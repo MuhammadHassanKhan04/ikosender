@@ -22,7 +22,7 @@ const FeaturesPage = () => {
                     </Link>
                     <div className="flex items-center gap-4">
                         <Link to="/login">
-                            <Button className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 h-11 font-bold shadow-lg shadow-blue-100">Try Mail Maven</Button>
+                            <Button className="bg-blue-600 hover:bg-blue-700 rounded-xl px-6 h-11 font-bold shadow-lg shadow-blue-100">Try IkoSender</Button>
                         </Link>
                     </div>
                 </div>
@@ -135,13 +135,13 @@ const FeaturesPage = () => {
                     <AccordionItem value="item-1" className="border border-gray-100 rounded-2xl px-6 bg-white">
                         <AccordionTrigger className="font-bold py-6 hover:no-underline">How reliable is the email delivery?</AccordionTrigger>
                         <AccordionContent className="text-gray-500 font-medium leading-relaxed pb-6">
-                            Mail Maven uses a multi-relay system that intelligently routes emails through the fastest and most reputable paths, achieving a 99.8% inbox placement rate.
+                            IkoSender uses a multi-relay system that intelligently routes emails through the fastest and most reputable paths, achieving a 99.8% inbox placement rate.
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2" className="border border-gray-100 rounded-2xl px-6 bg-white">
                         <AccordionTrigger className="font-bold py-6 hover:no-underline">Can I connect my own SMTP server?</AccordionTrigger>
                         <AccordionContent className="text-gray-500 font-medium leading-relaxed pb-6">
-                            Yes, Mail Maven allows you to connect any SMTP-compatible server, including Mailgun, SendGrid, Amazon SES, and your own private relays.
+                            Yes, IkoSender allows you to connect any SMTP-compatible server, including Mailgun, SendGrid, Amazon SES, and your own private relays.
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-3" className="border border-gray-100 rounded-2xl px-6 bg-white">

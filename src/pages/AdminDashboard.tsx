@@ -37,7 +37,7 @@ const AdminDashboard = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold tracking-tight text-gray-900">Admin Control</h1>
-                            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Mail Maven Enterprise</p>
+                            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">IkoSender Enterprise</p>
                         </div>
                     </div>
 
@@ -104,7 +104,7 @@ const AdminDashboard = () => {
                                         type="email"
                                         value={newUser.email}
                                         onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                                        placeholder="user@mail-maven.com"
+                                        placeholder="user@ikosender.com"
                                         className="h-12 rounded-xl bg-gray-50 border-gray-100 focus:bg-white transition-all font-medium"
                                         required
                                     />
@@ -224,7 +224,7 @@ const AdminDashboard = () => {
             </div>
 
             <footer className="max-w-7xl mx-auto p-10 text-center border-t border-gray-100">
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">Mail Maven Enterprise • Secured By CloudAuth</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em]">IkoSender Enterprise • Secured By CloudAuth</p>
             </footer>
         </div>
     );

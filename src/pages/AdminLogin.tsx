@@ -63,7 +63,7 @@ const AdminLogin = () => {
                                     <Label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest ml-1">Admin Email</Label>
                                     <Input
                                         type="email"
-                                        placeholder="admin@mail-maven.com"
+                                        placeholder="admin@ikosender.com"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required

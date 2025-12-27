@@ -41,7 +41,7 @@ const Login = () => {
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-bold uppercase text-gray-400 tracking-widest ml-1">Username or Email</Label>
                                     <Input
-                                        placeholder="E.g. alex_maven"
+                                        placeholder="E.g. alex_ikosender"
                                         value={identifier}
                                         onChange={(e) => setIdentifier(e.target.value)}
                                         required

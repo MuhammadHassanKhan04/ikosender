@@ -35,7 +35,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         </div>
         {!collapsed && (
           <span className="text-xl font-bold tracking-tight text-gray-900">
-            Mail Maven
+            IkoSender
           </span>
         )}
       </div>
@@ -128,7 +128,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <button onClick={() => setMobileOpen(true)} className="text-gray-500 p-2 hover:bg-gray-50 rounded-lg"> <Menu className="w-6 h-6" /> </button>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"> <Mail className="w-4 h-4" /> </div>
-          <span className="font-bold text-gray-900">Mail Maven</span>
+          <span className="font-bold text-gray-900">IkoSender</span>
         </div>
         <div className="w-10" />
       </header>

@@ -21,7 +21,7 @@ const Home = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const faqs = [
-    { q: "How secure is Mail Maven?", a: "We use enterprise-grade AES-256 encryption for all data at rest and TLS 1.3 for data in transit. Your security is our top priority." },
+    { q: "How secure is IkoSender?", a: "We use enterprise-grade AES-256 encryption for all data at rest and TLS 1.3 for data in transit. Your security is our top priority." },
     { q: "Can I import my existing contacts?", a: "Yes! You can import contacts via CSV, Excel, or direct integration with popular CRM platforms like Salesforce and HubSpot." },
     { q: "Is there a limit on emails I can send?", a: "Limits vary by plan, but our infrastructure is designed to scale with your needs, supporting millions of dispatches daily." },
     { q: "Do you offer real-time analytics?", a: "Absolutely. You get live tracking for opens, clicks, bounces, and geolocation data the moment your campaign launches." }
@@ -36,7 +36,7 @@ const Home = () => {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
               <Mail className="h-4 w-4" />
             </div>
-            Mail Maven
+            IkoSender
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-bold">
             <Link to="/features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</Link>
@@ -218,7 +218,7 @@ const Home = () => {
         <div className="container mx-auto max-w-5xl bg-blue-600 rounded-[4rem] p-12 md:p-24 text-center text-white relative overflow-hidden shadow-2xl shadow-blue-200">
           <div className="relative z-10">
             <h2 className="text-4xl md:text-6xl font-black mb-8 leading-tight">Ready to Upgrade <br />Your Outreach?</h2>
-            <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto font-medium">Join 5,000+ businesses who rely on Mail Maven for their mission-critical communications.</p>
+            <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto font-medium">Join 5,000+ businesses who rely on IkoSender for their mission-critical communications.</p>
             <Link to="/login">
               <Button size="lg" className="h-16 px-12 rounded-2xl text-lg bg-white text-blue-600 hover:bg-blue-50 transition-all hover:scale-105 font-bold shadow-xl">
                 Get Started Free

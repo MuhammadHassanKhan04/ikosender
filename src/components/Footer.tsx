@@ -14,7 +14,7 @@ const Footer = () => {
                                 <Mail className="w-5 h-5" />
                             </div>
                             <span className="text-2xl font-bold tracking-tighter text-gray-900">
-                                Mail Maven
+                                IkoSender
                             </span>
                         </div>
                         <p className="text-gray-500 font-medium leading-relaxed max-w-sm">
@@ -79,7 +79,7 @@ const Footer = () => {
                 {/* Legal and Bottom Bar */}
                 <div className="pt-12 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-8">
                     <p className="text-gray-400 text-sm font-medium">
-                        © 2024 Mail Maven Intelligence. All rights reserved. Professional Grade.
+                        © 2024 IkoSender Intelligence. All rights reserved. Professional Grade.
                     </p>
                     <div className="flex flex-wrap justify-center gap-8 text-sm font-bold text-gray-400">
                         <a href="#" className="hover:text-blue-600 transition-colors">Privacy Policy</a>

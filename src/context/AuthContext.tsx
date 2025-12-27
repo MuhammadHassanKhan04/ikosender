@@ -31,14 +31,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Load user from session on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("mail_maven_user");
+    const storedUser = localStorage.getItem("ikosender_user");
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser);
         setUser(parsed);
         setIsAdmin(parsed.role === "admin");
       } catch (e) {
-        localStorage.removeItem("mail_maven_user");
+        localStorage.removeItem("ikosender_user");
       }
     }
   }, []);
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const adminUser: User = { name: "Admin", email: cleanEmail, role: "admin" };
       setUser(adminUser);
       setIsAdmin(true);
-      localStorage.setItem("mail_maven_user", JSON.stringify(adminUser));
+      localStorage.setItem("ikosender_user", JSON.stringify(adminUser));
       toast.success("Welcome back, Admin!");
       return true;
     }
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     // Check against LocalStorage "DB" for normal users
-    const storedUsersStr = localStorage.getItem("mail_maven_db_users");
+    const storedUsersStr = localStorage.getItem("ikosender_db_users");
     const storedUsers: any[] = storedUsersStr ? JSON.parse(storedUsersStr) : [];
 
     const foundUser = storedUsers.find(
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
       setUser(sessionUser);
       setIsAdmin(false);
-      localStorage.setItem("mail_maven_user", JSON.stringify(sessionUser));
+      localStorage.setItem("ikosender_user", JSON.stringify(sessionUser));
       toast.success(`Welcome, ${foundUser.name}!`);
       return true;
     }
@@ -97,14 +97,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     setIsAdmin(false);
-    localStorage.removeItem("mail_maven_user");
+    localStorage.removeItem("ikosender_user");
     navigate("/");
     toast.success("Logged out successfully");
   };
 
   // Admin Tools
   const getAllUsers = () => {
-    const storedUsersStr = localStorage.getItem("mail_maven_db_users");
+    const storedUsersStr = localStorage.getItem("ikosender_db_users");
     return storedUsersStr ? JSON.parse(storedUsersStr) : [];
   };
 
@@ -116,14 +116,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     const newUser = { name, email, password: pass };
     const updatedUsers = [...currentUsers, newUser];
-    localStorage.setItem("mail_maven_db_users", JSON.stringify(updatedUsers));
+    localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
     toast.success("User added successfully");
   };
 
   const deleteUser = (email: string) => {
     const currentUsers = getAllUsers();
     const updatedUsers = currentUsers.filter((u: any) => u.email !== email);
-    localStorage.setItem("mail_maven_db_users", JSON.stringify(updatedUsers));
+    localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
     toast.success("User deleted successfully");
   };
 
