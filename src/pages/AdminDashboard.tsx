@@ -19,20 +19,13 @@ const AdminDashboard = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isActionLoading, setIsActionLoading] = useState(false);
-    const [dbError, setDbError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const fetchUsers = async () => {
         setIsLoading(true);
-        setDbError(null);
-        try {
-            const data = await getAllUsers();
-            setUsers(data);
-        } catch (error: any) {
-            setDbError(error.message || "Table 'app_users' not found");
-        } finally {
-            setIsLoading(false);
-        }
+        const data = await getAllUsers();
+        setUsers(data);
+        setIsLoading(false);
     };
 
     React.useEffect(() => {
@@ -177,50 +170,7 @@ const AdminDashboard = () => {
 
                         <Card className="border-none shadow-xl shadow-gray-200/50 rounded-3xl overflow-hidden bg-white">
                             <CardContent className="p-0">
-                                {dbError ? (
-                                    <div className="p-10 text-center">
-                                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                                            <Shield className="w-8 h-8 text-red-500" />
-                                        </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">Database Setup Required</h3>
-                                        <p className="text-gray-500 mb-8 max-w-md mx-auto">The table <code>app_users</code> was not found. Please run the SQL migration in your Supabase dashboard to enable global user management.</p>
-                                        <div className="bg-gray-900 rounded-2xl p-6 text-left relative group">
-                                            <pre className="text-[10px] text-blue-400 font-mono overflow-x-auto">
-                                                {`CREATE TABLE public.app_users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all" ON public.app_users FOR ALL USING (true);`}
-                                            </pre>
-                                            <Button
-                                                variant="secondary"
-                                                size="sm"
-                                                className="absolute top-4 right-4 h-8 text-[10px] font-bold"
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(`CREATE TABLE public.app_users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-ALTER TABLE public.app_users ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow all" ON public.app_users FOR ALL USING (true);`);
-                                                    toast.success("SQL Copied!");
-                                                }}
-                                            >
-                                                Copy SQL
-                                            </Button>
-                                        </div>
-                                        <Button onClick={fetchUsers} variant="outline" className="mt-8 rounded-xl font-bold">
-                                            Check Again
-                                        </Button>
-                                    </div>
-                                ) : isLoading ? (
+                                {isLoading ? (
                                     <div className="text-center py-20 bg-white">
                                         <div className="w-16 h-16 bg-blue-50/50 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                                             <Shield className="w-8 h-8 text-blue-300" />

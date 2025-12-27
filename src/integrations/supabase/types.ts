@@ -65,30 +65,6 @@ export type Database = {
         }
         Relationships: []
       }
-      app_users: {
-        Row: {
-          id: string
-          name: string
-          email: string
-          password: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          email: string
-          password: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          email?: string
-          password?: string
-          created_at?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never
