@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error: any) {
       console.error("Error fetching users:", error);
       toast.error(`Database Error: ${error.message || "Table 'app_users' not found"}`);
-      return [];
+      throw error; // Rethrow to let component handle it
     }
   };
 
