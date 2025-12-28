@@ -57,36 +57,61 @@ const Home = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-6 relative overflow-hidden bg-gradient-to-b from-blue-50/50 to-white">
-        <div className="container mx-auto text-center max-w-4xl relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/5 border border-blue-600/10 text-blue-600 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-            Enterprise Grade Email Engine
-          </div>
-          <h1 className="text-5xl md:text-8xl font-black tracking-tight mb-8 leading-[1.1] animate-slide-in-up text-gray-900">
-            Mailing, <br />
-            <span className="text-blue-600">Perfected.</span>
-          </h1>
-          <p className="text-xl text-gray-500 mb-12 max-w-2xl mx-auto font-medium leading-relaxed animate-slide-in-up" style={{ animationDelay: "0.1s" }}>
-            The professional toolset for high-performance email campaigns.
-            Reach your audience with precision and intelligence.
-          </p>
-          <div className="flex flex-wrap justify-center gap-6 animate-slide-in-up" style={{ animationDelay: "0.2s" }}>
-            <Link to="/login">
-              <Button size="lg" className="h-16 px-10 rounded-2xl text-lg bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-105 shadow-2xl shadow-blue-200 font-bold flex items-center gap-3">
-                Launch Console <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/features">
-              <Button variant="outline" size="lg" className="h-16 px-10 rounded-2xl text-lg border-2 hover:bg-gray-50 font-bold text-gray-600">
-                Explore Features
-              </Button>
-            </Link>
-          </div>
+      <section className="pt-40 pb-20 px-6 relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="/hero-bg.png"
+            alt="Hero Background"
+            className="w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-white/60 to-white"></div>
         </div>
 
-        {/* Abstract Background Effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-blue-200/20 rounded-full blur-[120px] -z-10 animate-pulse-glow"></div>
+        <div className="container mx-auto relative z-10">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-600/5 border border-blue-600/10 text-blue-600 text-xs font-bold uppercase tracking-widest mb-8 animate-fade-in shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                Enterprise Grade Email Engine
+              </div>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-[1.1] animate-slide-in-up text-gray-900">
+                Mailing, <br />
+                <span className="text-blue-600">Perfected.</span>
+              </h1>
+              <p className="text-xl text-gray-500 mb-12 max-w-xl font-medium leading-relaxed animate-slide-in-up" style={{ animationDelay: "0.1s" }}>
+                The professional toolset for high-performance email campaigns.
+                Reach your audience with precision and intelligence.
+              </p>
+              <div className="flex flex-wrap gap-6 animate-slide-in-up" style={{ animationDelay: "0.2s" }}>
+                <Link to="/login">
+                  <Button size="lg" className="h-16 px-10 rounded-2xl text-lg bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-105 shadow-2xl shadow-blue-200 font-bold flex items-center gap-3">
+                    Launch Console <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Link to="/features">
+                  <Button variant="outline" size="lg" className="h-16 px-10 rounded-2xl text-lg border-2 hover:bg-gray-50 font-bold text-gray-600">
+                    Explore Features
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Marketing Object */}
+            <div className="relative animate-slide-in-up" style={{ animationDelay: "0.3s" }}>
+              <div className="relative z-10">
+                <img
+                  src="/hero-marketing.png"
+                  alt="Email Marketing Illustration"
+                  className="w-full h-auto drop-shadow-2xl animate-float"
+                />
+              </div>
+              {/* Decorative Elements */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-200/20 rounded-full blur-[120px] -z-10 animate-pulse-glow"></div>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Stats Section */}
