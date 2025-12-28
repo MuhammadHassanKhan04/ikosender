@@ -24,6 +24,40 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const MONGODB_DATA_API_URL = import.meta.env.VITE_MONGODB_DATA_API_URL || "";
+const MONGODB_API_KEY = import.meta.env.VITE_MONGODB_API_KEY || "";
+const MONGODB_APP_ID = import.meta.env.VITE_MONGODB_APP_ID || "";
+const MONGODB_CLUSTER = "Cluster0";
+const MONGODB_DATABASE = "ikosender";
+const MONGODB_COLLECTION = "users";
+
+const mongoFetch = async (action: string, body: any) => {
+  if (!MONGODB_DATA_API_URL || !MONGODB_API_KEY) {
+    console.warn("MongoDB Credentials missing. Using LocalStorage fallback.");
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${MONGODB_DATA_API_URL}/action/${action}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": MONGODB_API_KEY,
+      },
+      body: JSON.stringify({
+        dataSource: MONGODB_CLUSTER,
+        database: MONGODB_DATABASE,
+        collection: MONGODB_COLLECTION,
+        ...body,
+      }),
+    });
+    return await response.json();
+  } catch (error) {
+    console.error(`MongoDB ${action} failed:`, error);
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -69,15 +103,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return loginAdmin(cleanIdentifier, cleanPass);
     }
 
-    // Check against LocalStorage "DB" for normal users
-    const storedUsersStr = localStorage.getItem("ikosender_db_users");
-    const storedUsers: any[] = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+    // Check against MongoDB for normal users
+    const mongoRes = await mongoFetch("findOne", {
+      filter: {
+        $or: [{ name: cleanIdentifier }, { email: cleanIdentifier }],
+        password: cleanPass
+      }
+    });
 
-    const foundUser = storedUsers.find(
-      (u) => (u.name === cleanIdentifier || u.email === cleanIdentifier) && u.password === cleanPass
-    );
-
-    if (foundUser) {
+    if (mongoRes?.document) {
+      const foundUser = mongoRes.document;
       const sessionUser: User = {
         name: foundUser.name,
         email: foundUser.email,
@@ -87,6 +122,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsAdmin(false);
       localStorage.setItem("ikosender_user", JSON.stringify(sessionUser));
       toast.success(`Welcome back, ${foundUser.name}!`);
+      return true;
+    }
+
+    // Fallback to LocalStorage for backward compatibility
+    const storedUsersStr = localStorage.getItem("ikosender_db_users");
+    const storedUsers: any[] = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+
+    const foundUserLocal = storedUsers.find(
+      (u) => (u.name === cleanIdentifier || u.email === cleanIdentifier) && u.password === cleanPass
+    );
+
+    if (foundUserLocal) {
+      const sessionUser: User = {
+        name: foundUserLocal.name,
+        email: foundUserLocal.email,
+        role: "user"
+      };
+      setUser(sessionUser);
+      setIsAdmin(false);
+      localStorage.setItem("ikosender_user", JSON.stringify(sessionUser));
+      toast.success(`Welcome back, ${foundUserLocal.name}!`);
       return true;
     }
 
@@ -104,8 +160,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Admin Tools
   const getAllUsers = async () => {
-    const storedUsersStr = localStorage.getItem("ikosender_db_users");
-    const users = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+    const mongoRes = await mongoFetch("find", { filter: {} });
+    let users = [];
+
+    if (mongoRes?.documents) {
+      users = mongoRes.documents;
+    } else {
+      const storedUsersStr = localStorage.getItem("ikosender_db_users");
+      users = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+    }
+
     return users.map((u: any) => ({
       name: u.name,
       email: u.email,
@@ -114,26 +178,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const addUser = async (name: string, email: string, pass: string) => {
-    const currentUsersStr = localStorage.getItem("ikosender_db_users");
-    const currentUsers = currentUsersStr ? JSON.parse(currentUsersStr) : [];
-
-    if (currentUsers.some((u: any) => u.email === email)) {
-      toast.error("User with this email already exists");
+    // Check if user already exists in MongoDB
+    const existing = await mongoFetch("findOne", { filter: { email } });
+    if (existing?.document) {
+      toast.error("User with this email already exists in Global DB");
       return;
     }
 
-    const newUserObj = { name, email, password: pass };
-    const updatedUsers = [...currentUsers, newUserObj];
-    localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
-    toast.success("User added successfully to local storage");
+    // Add to MongoDB
+    const mongoRes = await mongoFetch("insertOne", {
+      document: { name, email, password: pass, created_at: new Date().toISOString() }
+    });
+
+    if (mongoRes?.insertedId) {
+      toast.success("User added successfully to Global DB");
+    } else {
+      // Fallback to local storage if Mongo fails
+      const currentUsersStr = localStorage.getItem("ikosender_db_users");
+      const currentUsers = currentUsersStr ? JSON.parse(currentUsersStr) : [];
+
+      if (currentUsers.some((u: any) => u.email === email)) {
+        toast.error("User with this email already exists locally");
+        return;
+      }
+
+      const newUserObj = { name, email, password: pass };
+      const updatedUsers = [...currentUsers, newUserObj];
+      localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
+      toast.success("User added to local storage (Global DB connection failed)");
+    }
   };
 
   const deleteUser = async (email: string) => {
+    // Delete from MongoDB
+    await mongoFetch("deleteOne", { filter: { email } });
+
+    // Delete from local storage
     const currentUsersStr = localStorage.getItem("ikosender_db_users");
     const currentUsers = currentUsersStr ? JSON.parse(currentUsersStr) : [];
     const updatedUsers = currentUsers.filter((u: any) => u.email !== email);
     localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
-    toast.success("User deleted from local storage");
+    toast.success("User deleted globally and locally");
   };
 
   return (
