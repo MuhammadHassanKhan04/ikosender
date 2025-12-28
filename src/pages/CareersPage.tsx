@@ -79,43 +79,23 @@ const CareersPage = () => {
                 </div>
             </section>
 
-            {/* OPEN POSITIONS */}
+            {/* COMING SOON */}
             <section className="bg-gray-50/50 py-32 border-y border-gray-100">
                 <div className="container mx-auto px-6 max-w-4xl">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-16 text-center">Open Positions</h2>
-                    <div className="space-y-6">
-                        <JobCard
-                            icon={<Code className="w-6 h-6" />}
-                            title="Senior Full-Stack Engineer"
-                            department="Engineering"
-                            location="Remote"
-                            type="Full-time"
-                            description="Build scalable backend systems and beautiful user interfaces using React, Node.js, and PostgreSQL."
-                        />
-                        <JobCard
-                            icon={<Palette className="w-6 h-6" />}
-                            title="Product Designer"
-                            department="Design"
-                            location="Remote"
-                            type="Full-time"
-                            description="Design intuitive experiences for our email marketing platform. Experience with Figma and design systems required."
-                        />
-                        <JobCard
-                            icon={<MessageSquare className="w-6 h-6" />}
-                            title="Customer Success Manager"
-                            department="Customer Success"
-                            location="Remote"
-                            type="Full-time"
-                            description="Help our customers succeed with IkoSender. Build relationships and drive product adoption."
-                        />
-                        <JobCard
-                            icon={<TrendingUp className="w-6 h-6" />}
-                            title="Growth Marketing Lead"
-                            department="Marketing"
-                            location="Remote"
-                            type="Full-time"
-                            description="Drive user acquisition and retention through data-driven marketing campaigns and experiments."
-                        />
+                    <div className="text-center">
+                        <div className="w-24 h-24 bg-blue-600 text-white rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-200">
+                            <Briefcase className="w-12 h-12" />
+                        </div>
+                        <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">Coming Soon</h2>
+                        <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto mb-8">
+                            We're currently building our team and will be posting open positions soon.
+                            In the meantime, feel free to reach out if you're interested in joining IkoSender.
+                        </p>
+                        <Link to="/contact">
+                            <Button className="bg-blue-600 hover:bg-blue-700 rounded-2xl px-12 h-16 font-bold text-lg">
+                                Get in Touch
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </section>
