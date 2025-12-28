@@ -61,7 +61,7 @@ const Home = () => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/image-removebg-preview.png"
+            src="/hero-bg.png"
             alt="Hero Background"
             className="w-full h-full object-cover opacity-40"
           />
@@ -102,7 +102,7 @@ const Home = () => {
             <div className="relative animate-slide-in-up" style={{ animationDelay: "0.3s" }}>
               <div className="relative z-10">
                 <img
-                  src="/hero-marketing.png"
+                  src="/image-removebg-preview.png"
                   alt="Email Marketing Illustration"
                   className="w-full h-auto drop-shadow-2xl animate-float"
                 />
