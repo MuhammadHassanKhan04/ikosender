@@ -8,6 +8,11 @@ import Home from "./pages/Home";
 import FeaturesPage from "./pages/FeaturesPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import PricingPage from "./pages/PricingPage";
+import SecurityPage from "./pages/SecurityPage";
+import AnalyticsPublicPage from "./pages/AnalyticsPublicPage";
+import CareersPage from "./pages/CareersPage";
+import TrustCenterPage from "./pages/TrustCenterPage";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -41,8 +46,14 @@ const App = () => (
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/security" element={<SecurityPage />} />
+            <Route path="/analytics" element={<AnalyticsPublicPage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/aboutus" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/trustcenter" element={<TrustCenterPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin" element={<Navigate to="/admin/login" replace />} />
             <Route path="/admin/login" element={<AdminLogin />} />

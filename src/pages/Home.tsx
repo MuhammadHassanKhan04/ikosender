@@ -61,7 +61,7 @@ const Home = () => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            src="/hero-bg.png"
+            src="/image-removebg-preview.png"
             alt="Hero Background"
             className="w-full h-full object-cover opacity-40"
           />
