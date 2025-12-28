@@ -24,39 +24,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const MONGODB_DATA_API_URL = import.meta.env.VITE_MONGODB_DATA_API_URL || "";
-const MONGODB_API_KEY = import.meta.env.VITE_MONGODB_API_KEY || "";
-const MONGODB_APP_ID = import.meta.env.VITE_MONGODB_APP_ID || "";
-const MONGODB_CLUSTER = "Cluster0";
-const MONGODB_DATABASE = "ikosender";
-const MONGODB_COLLECTION = "users";
-
-const mongoFetch = async (action: string, body: any) => {
-  if (!MONGODB_DATA_API_URL || !MONGODB_API_KEY) {
-    console.warn("MongoDB Credentials missing. Using LocalStorage fallback.");
-    return null;
-  }
-
-  try {
-    const response = await fetch(`${MONGODB_DATA_API_URL}/action/${action}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": MONGODB_API_KEY,
-      },
-      body: JSON.stringify({
-        dataSource: MONGODB_CLUSTER,
-        database: MONGODB_DATABASE,
-        collection: MONGODB_COLLECTION,
-        ...body,
-      }),
-    });
-    return await response.json();
-  } catch (error) {
-    console.error(`MongoDB ${action} failed:`, error);
-    return null;
-  }
-};
+import { supabase } from "@/integrations/supabase/client";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -103,16 +71,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return loginAdmin(cleanIdentifier, cleanPass);
     }
 
-    // Check against MongoDB for normal users
-    const mongoRes = await mongoFetch("findOne", {
-      filter: {
-        $or: [{ name: cleanIdentifier }, { email: cleanIdentifier }],
-        password: cleanPass
-      }
-    });
+    // Check against Supabase for normal users
+    const { data: foundUser, error } = await supabase
+      .from("user_registry" as any)
+      .select("*")
+      .or(`name.eq.${cleanIdentifier},email.eq.${cleanIdentifier}`)
+      .eq("password", cleanPass)
+      .single();
 
-    if (mongoRes?.document) {
-      const foundUser = mongoRes.document;
+    if (foundUser) {
       const sessionUser: User = {
         name: foundUser.name,
         email: foundUser.email,
@@ -123,6 +90,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("ikosender_user", JSON.stringify(sessionUser));
       toast.success(`Welcome back, ${foundUser.name}!`);
       return true;
+    }
+
+    if (error && error.code !== "PGRST116") {
+      console.error("Supabase Auth Error:", error);
     }
 
     // Fallback to LocalStorage for backward compatibility
@@ -160,17 +131,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Admin Tools
   const getAllUsers = async () => {
-    const mongoRes = await mongoFetch("find", { filter: {} });
-    let users = [];
+    const { data, error } = await supabase
+      .from("user_registry" as any)
+      .select("*");
 
-    if (mongoRes?.documents) {
-      users = mongoRes.documents;
-    } else {
+    if (error) {
+      console.error("Fetch Users Error:", error);
+      // Fallback
       const storedUsersStr = localStorage.getItem("ikosender_db_users");
-      users = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+      const users = storedUsersStr ? JSON.parse(storedUsersStr) : [];
+      return users.map((u: any) => ({
+        name: u.name,
+        email: u.email,
+        role: "user" as const
+      }));
     }
 
-    return users.map((u: any) => ({
+    return (data || []).map((u: any) => ({
       name: u.name,
       email: u.email,
       role: "user" as const
@@ -178,47 +155,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const addUser = async (name: string, email: string, pass: string) => {
-    // Check if user already exists in MongoDB
-    const existing = await mongoFetch("findOne", { filter: { email } });
-    if (existing?.document) {
+    const { data: existing } = await supabase
+      .from("user_registry" as any)
+      .select("email")
+      .eq("email", email)
+      .single();
+
+    if (existing) {
       toast.error("User with this email already exists in Global DB");
       return;
     }
 
-    // Add to MongoDB
-    const mongoRes = await mongoFetch("insertOne", {
-      document: { name, email, password: pass, created_at: new Date().toISOString() }
-    });
+    const { error } = await supabase
+      .from("user_registry" as any)
+      .insert([{ name, email, password: pass }]);
 
-    if (mongoRes?.insertedId) {
+    if (!error) {
       toast.success("User added successfully to Global DB");
     } else {
-      // Fallback to local storage if Mongo fails
-      const currentUsersStr = localStorage.getItem("ikosender_db_users");
-      const currentUsers = currentUsersStr ? JSON.parse(currentUsersStr) : [];
-
-      if (currentUsers.some((u: any) => u.email === email)) {
-        toast.error("User with this email already exists locally");
-        return;
-      }
-
-      const newUserObj = { name, email, password: pass };
-      const updatedUsers = [...currentUsers, newUserObj];
-      localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
-      toast.success("User added to local storage (Global DB connection failed)");
+      console.error("Add User Error:", error);
+      toast.error("Failed to add user to Global DB. Check console for details.");
     }
   };
 
   const deleteUser = async (email: string) => {
-    // Delete from MongoDB
-    await mongoFetch("deleteOne", { filter: { email } });
+    const { error } = await supabase
+      .from("user_registry" as any)
+      .delete()
+      .eq("email", email);
 
-    // Delete from local storage
-    const currentUsersStr = localStorage.getItem("ikosender_db_users");
-    const currentUsers = currentUsersStr ? JSON.parse(currentUsersStr) : [];
-    const updatedUsers = currentUsers.filter((u: any) => u.email !== email);
-    localStorage.setItem("ikosender_db_users", JSON.stringify(updatedUsers));
-    toast.success("User deleted globally and locally");
+    if (!error) {
+      toast.success("User deleted globally");
+    } else {
+      console.error("Delete User Error:", error);
+      toast.error("Failed to delete user globally");
+    }
   };
 
   return (
